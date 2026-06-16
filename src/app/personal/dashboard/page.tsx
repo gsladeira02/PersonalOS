@@ -25,13 +25,17 @@ function DashboardContent() {
   useEffect(() => {
     if (!trainer) return;
     async function load() {
-      const [students, workouts, charges, paid, appointments, health] = await Promise.all([
-        supabase.from('students').select('id', { count: 'exact', head: true }).eq('trainer_id', trainer.id).eq('status', 'active'),
-        supabase.from('workouts').select('id', { count: 'exact', head: true }).eq('trainer_id', trainer.id),
-        supabase.from('student_charges').select('id', { count: 'exact', head: true }).eq('trainer_id', trainer.id).in('status', ['pending', 'overdue']),
-        supabase.from('student_charges').select('amount_cents').eq('trainer_id', trainer.id).eq('status', 'paid'),
-        supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('trainer_id', trainer.id).gte('start_time', new Date().toISOString().slice(0, 10)),
-        supabase.from('health_connections').select('id', { count: 'exact', head: true }).eq('trainer_id', trainer.id).eq('status', 'connected')
+  const trainerId = trainer?.id;
+
+  if (!trainerId) return;
+
+  const [students, workouts, charges, paid, appointments, health] = await Promise.all([
+        supabase.from('students').select('id', { count: 'exact', head: true }).eq('trainer_id', trainerId).eq('status', 'active'),
+        supabase.from('workouts').select('id', { count: 'exact', head: true }).eq('trainer_id', trainerId),
+        supabase.from('student_charges').select('id', { count: 'exact', head: true }).eq('trainer_id', trainerId).in('status', ['pending', 'overdue']),
+        supabase.from('student_charges').select('amount_cents').eq('trainer_id', trainerId).eq('status', 'paid'),
+        supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('trainer_id', trainerId).gte('start_time', new Date().toISOString().slice(0, 10)),
+        supabase.from('health_connections').select('id', { count: 'exact', head: true }).eq('trainer_id', trainerId).eq('status', 'connected')
       ]);
       const paidRevenue = (paid.data || []).reduce((sum, row) => sum + Number(row.amount_cents || 0), 0);
       setData({
