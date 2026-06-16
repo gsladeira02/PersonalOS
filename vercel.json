@@ -1,9 +1,0 @@
-{
-  "framework": "nextjs",
-  "crons": [
-    {
-      "path": "/api/health/sync",
-      "schedule": "0 8 * * *"
-    }
-  ]
-}
