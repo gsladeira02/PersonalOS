@@ -29,7 +29,10 @@ export async function GET(request: Request) {
     const { data: student } = await supabase.from('students').select('id,trainer_id').eq('user_id', user.id).single();
 
     const isTrainerOwner = trainer?.id === video.trainer_id;
-    const isStudentOwner = student?.trainer_id === video.trainer_id && (!video.student_id || video.student_id === student.id);
+    const isStudentOwner =
+  !!student &&
+  student.trainer_id === video.trainer_id &&
+  (!video.student_id || video.student_id === student.id);
 
     if (!isTrainerOwner && !isStudentOwner) {
       return NextResponse.json({ error: 'Sem permissão para este vídeo.' }, { status: 403 });
